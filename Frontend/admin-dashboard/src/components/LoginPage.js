@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import './LoginPage.css';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -30,41 +31,72 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-      <form onSubmit={onSubmit} style={{ width: 320, display: 'grid', gap: 12 }}>
-        <h2>Admin Login</h2>
-        {error && (
-          <div style={{ color: 'white', background: '#d33', padding: 8, borderRadius: 4 }}>{error}</div>
-        )}
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="admin@example.com"
-            style={{ width: '100%', padding: 8 }}
-          />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="••••••••"
-            style={{ width: '100%', padding: 8 }}
-          />
-        </label>
-        <button type="submit" disabled={loading} style={{ padding: 10 }}>
-          {loading ? 'Signing in…' : 'Login'}
-        </button>
-        <div style={{ fontSize: 12, color: '#666' }}>
-          Tip: Ensure you have registered an admin via backend /api/auth/register.
+    <div className="auth-layout">
+      <aside className="auth-highlight">
+        <div className="auth-highlight__inner">
+          <span className="auth-badge">NextGen Fusion Console</span>
+          <h1>Integrated logistics, streamlined.</h1>
+          <p>
+            Manage consignments, monitor live statuses, and keep your customers informed from a single unified dashboard.
+          </p>
+          <ul>
+            <li>Secure single sign-on for administrators</li>
+            <li>Real-time shipment visibility</li>
+            <li>Actionable insights for operations</li>
+          </ul>
         </div>
-      </form>
+      </aside>
+      <main className="auth-form-wrapper" aria-live="polite">
+        <form className="auth-card" onSubmit={onSubmit}>
+          <header className="auth-card__header">
+            <span className="auth-chip">Admin Login</span>
+            <h2>Sign in to your workspace</h2>
+            <p>Enter your credentials to access the shipment management dashboard.</p>
+          </header>
+
+          {error && (
+            <div className="auth-alert" role="alert">
+              {error}
+            </div>
+          )}
+
+          <label className="auth-field">
+            <span>Email</span>
+            <input
+              className="auth-input"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              placeholder="admin@example.com"
+            />
+          </label>
+
+          <label className="auth-field">
+            <span>Password</span>
+            <input
+              className="auth-input"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              placeholder="••••••••"
+            />
+          </label>
+
+          <button className="auth-submit" type="submit" disabled={loading} aria-busy={loading}>
+            {loading ? 'Signing in…' : 'Continue'}
+          </button>
+
+          <footer className="auth-footer">
+            <p>
+              Tip: Ensure you have registered an admin via <code>/api/auth/register</code> before attempting to log in.
+            </p>
+          </footer>
+        </form>
+      </main>
     </div>
   );
 };
