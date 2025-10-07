@@ -65,7 +65,7 @@ const Dashboard = () => {
 
   return (
     <div className="page">
-  <NavBar showAdminLink={false} />
+      <NavBar showAdminLink={false} />
       <div className="container">
         <div className="topbar">
           <h2 className="title">Admin Dashboard</h2>
@@ -80,9 +80,10 @@ const Dashboard = () => {
           </div>
         )}
 
-        <div className="grid" style={{ marginTop: 16 }}>
+        <div className="grid">
           <section className="card">
             <h3>Create Shipment</h3>
+            <p>Register new orders, capture key customer information, and set an initial status.</p>
             <form onSubmit={handleCreate} className="form">
               <label className="field">
                 <span className="label">Tracking ID</span>
@@ -118,6 +119,7 @@ const Dashboard = () => {
 
           <section className="card">
             <h3>Update Shipment</h3>
+            <p>Locate an existing shipment and update its location, status, or estimated delivery.</p>
             <form onSubmit={handleUpdate} className="form form--single">
               <label className="field">
                 <span className="label">Tracking ID</span>
@@ -144,6 +146,20 @@ const Dashboard = () => {
           </section>
         </div>
       </div>
+      <footer className="footer">
+        <div className="footer__inner">
+          <span className="muted">Developed by</span>
+          <a
+            className="footer__link"
+            href="https://api.whatsapp.com/send/?phone=%2B917348228167&text=Hello%2C+I+need+a+website&type=phone_number&app_absent=0"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contact NextGen Fusion on WhatsApp"
+          >
+            NextGen Fusion
+          </a>
+        </div>
+      </footer>
     </div>
   );
 };
