@@ -1,0 +1,20 @@
+.nav{position:sticky;top:0;backdrop-filter:saturate(1.2) blur(6px); background:color-mix(in srgb, var(--bg) 85%, transparent);border-bottom:1px solid var(--border);z-index:20;color:var(--text)}
+.nav__inner{max-width:var(--container);margin:0 auto;display:flex;align-items:center;gap:24px;padding:12px 20px}
+.nav__left{display:flex;align-items:center;flex:1}
+.nav__center{flex:1;justify-content:center}
+.nav__right{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex:1}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none}
+.brand__logo{width:28px;height:28px;filter:drop-shadow(0 2px 6px color-mix(in oklab, var(--brand) 60%, transparent))}
+.brand__name{font-weight:700;letter-spacing:.4px}
+.nav__center{list-style:none;display:flex;gap:24px;margin:0;padding:0;justify-content:center}
+.nav__center a{color:var(--muted);text-decoration:none;font-weight:500}
+.nav__center a:hover{color:var(--text)}
+.btn{border:1px solid var(--border);color:var(--text);display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 14px;border-radius:10px;text-decoration:none;transition:transform .15s ease, box-shadow .2s ease, background .2s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn--ghost:hover{border-color:var(--brand);box-shadow:0 8px 20px rgba(106,167,255,.2)}
+.btn--primary{background:linear-gradient(135deg, var(--brand), var(--accent));color:#061021;border:0}
+.btn--primary:hover{box-shadow:0 8px 24px rgba(106,167,255,.25)}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:auto;width:auto;padding:0 10px}
+.theme-toggle .icon{transition:transform .35s ease, opacity .35s ease}
+.theme-toggle.is-animating .icon{transform:rotate(180deg);opacity:.85}
+@media (max-width:768px){.nav__center{display:none}}

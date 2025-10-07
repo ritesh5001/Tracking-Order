@@ -1,0 +1,32 @@
+:root{
+  /* Shared max width for containers (NavBar, pages, footer, etc.) */
+  --container: 1200px;
+}
+
+:root[data-theme='light']{
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --muted:#5a6477;
+  --text:#0a0f1f;
+  --brand:#2b72ff;
+  --accent:#10d9a8;
+  --border:rgba(0,0,0,.12);
+}
+
+:root[data-theme='dark']{
+  --bg:#0b1020;
+  --card:#0f1427;
+  --muted:#95a0b4;
+  --text:#e6ecff;
+  --brand:#6aa7ff;
+  --accent:#7af0ce;
+  --border:rgba(255,255,255,.08);
+}
+
+/* default: respect system if no attribute yet */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme]){ color-scheme: dark; }
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme]){ color-scheme: light; }
+}
