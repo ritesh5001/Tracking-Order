@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import logo from '../logo.svg';
 import './NavBar.css';
 import { useTheme } from '../theme/ThemeProvider.jsx';
@@ -7,6 +7,12 @@ import { useTheme } from '../theme/ThemeProvider.jsx';
 const NavBar = ({ showAdminLink = true }) => {
   const { theme, cycleMode } = useTheme();
   const [anim, setAnim] = useState(false);
+  const navLinks = useMemo(() => ([
+    { to: '/', label: 'Home' },
+    { to: '/track', label: 'Track Shipment' },
+    { to: '/about', label: 'About Us' },
+    { to: '/contact', label: 'Contact' },
+  ]), []);
   const onToggle = () => {
     setAnim(true);
     cycleMode();
@@ -22,9 +28,17 @@ const NavBar = ({ showAdminLink = true }) => {
           </Link>
         </div>
         <ul className="nav__center">
-          <li><a href="#home">Home</a></li>
-          <li><a href="#about">About Us</a></li>
-          <li><a href="#contact">Contact Us</a></li>
+          {navLinks.map(({ to, label }) => (
+            <li key={to}>
+              <NavLink
+                to={to}
+                className={({ isActive }) => `nav__link${isActive ? ' is-active' : ''}`}
+                end={to === '/'}
+              >
+                {label}
+              </NavLink>
+            </li>
+          ))}
         </ul>
         <div className="nav__right">
           {showAdminLink && (

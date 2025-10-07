@@ -2,6 +2,44 @@ const express = require("express");
 const router = express.Router();
 const Shipment = require("../models/Shipment");
 
+// POST /api/shipment/lookup
+// Lookup shipment by both trackingId and customer phone number
+router.post("/lookup", async (req, res) => {
+  const { trackingId, phone } = req.body || {};
+
+  if (!trackingId || !phone) {
+    return res.status(400).json({ message: "Tracking ID and phone number are required" });
+  }
+
+  const normalizedPhone = String(phone).replace(/\D/g, "");
+
+  try {
+    const shipment = await Shipment.findOne({
+      trackingId: trackingId.trim(),
+      customerPhone: normalizedPhone,
+    });
+
+    if (!shipment) {
+      return res.status(404).json({ message: "No shipment matches those details" });
+    }
+
+    const payload = {
+      trackingId: shipment.trackingId,
+      status: shipment.status,
+      currentLocation: shipment.currentLocation,
+      customerName: shipment.customerName,
+      customerPhone: shipment.customerPhone,
+      estimatedDelivery: shipment.estimatedDelivery,
+      createdAt: shipment.createdAt,
+    };
+
+    res.json(payload);
+  } catch (error) {
+    console.error("Error performing shipment lookup:", error);
+    res.status(500).json({ message: "Failed to lookup shipment" });
+  }
+});
+
 // GET /api/shipment/:trackingId
 // Find by trackingId only (MongoDB _id lookup removed)
 router.get("/:trackingId", async (req, res) => {
