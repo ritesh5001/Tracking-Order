@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import api from '../api/axios';
@@ -10,11 +10,13 @@ const ShipmentTracker = () => {
   const [result, setResult] = useState(null);
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
+  const [expandedIds, setExpandedIds] = useState([]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setErr('');
     setResult(null);
+    setExpandedIds([]);
     setLoading(true);
 
     try {
@@ -40,6 +42,27 @@ const ShipmentTracker = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (result?.type === 'phone') {
+      const shipments = Array.isArray(result.data.shipments) ? result.data.shipments : [];
+      if (result.data.count === 1 && shipments.length) {
+        const first = shipments[0];
+        const identifier = first?._id || first?.trackingId || 'shipment-0';
+        setExpandedIds([identifier]);
+      } else {
+        setExpandedIds([]);
+      }
+    } else if (result) {
+      setExpandedIds([]);
+    }
+  }, [result]);
+
+  const toggleShipmentPanel = (id) => {
+    setExpandedIds((prev) =>
+      prev.includes(id) ? prev.filter((entry) => entry !== id) : [...prev, id]
+    );
   };
 
   return (
@@ -118,21 +141,84 @@ const ShipmentTracker = () => {
             {result?.type === 'phone' && (
               <div className="result-card" aria-live="polite">
                 <h2>{result.data.count} shipment{result.data.count === 1 ? '' : 's'} on this number</h2>
-                <dl className="result-card__grid">
-                  {result.data.shipments?.map((shipment) => (
-                    <div key={shipment._id || shipment.trackingId} className="result-card__row">
-                      <dt>{shipment.trackingId}</dt>
-                      <dd>
-                        {shipment.status} —{' '}
-                        <span className="result-card__meta">
-                          {shipment.currentLocation}
-                          {shipment.estimatedDelivery &&
-                            ` · ETA ${new Date(shipment.estimatedDelivery).toLocaleDateString()}`}
-                        </span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+                <p className="track-list__intro">
+                  {result.data.count > 1
+                    ? 'Select a shipment below to view its full tracking details.'
+                    : 'Showing all tracking details for this delivery.'}
+                </p>
+                <div className="track-list">
+                  {result.data.shipments?.map((shipment, index) => {
+                    const identifier = shipment._id || shipment.trackingId || `shipment-${index}`;
+                    const isExpanded = expandedIds.includes(identifier);
+                    const detailId = `shipment-${identifier}-panel`;
+                    const statusLine = [shipment.status, shipment.currentLocation]
+                      .filter(Boolean)
+                      .join(' • ');
+
+                    return (
+                      <div
+                        key={identifier}
+                        className={`track-list__item${isExpanded ? ' track-list__item--expanded' : ''}`}
+                      >
+                        <button
+                          type="button"
+                          className="track-list__toggle"
+                          onClick={() => toggleShipmentPanel(identifier)}
+                          aria-expanded={isExpanded}
+                          aria-controls={detailId}
+                        >
+                          <div className="track-list__summary">
+                            <span className="track-list__title">{shipment.trackingId}</span>
+                            <span className="track-list__caption">{statusLine || 'Status unavailable'}</span>
+                          </div>
+                          <span className="track-list__chevron" aria-hidden="true">
+                            {isExpanded ? '▴' : '▾'}
+                          </span>
+                        </button>
+                        {isExpanded && (
+                          <div id={detailId} className="track-list__panel">
+                            <dl className="result-card__grid track-list__details">
+                              <div className="result-card__row">
+                                <dt>Status</dt>
+                                <dd>{shipment.status || '—'}</dd>
+                              </div>
+                              <div className="result-card__row">
+                                <dt>Current Location</dt>
+                                <dd>{shipment.currentLocation || '—'}</dd>
+                              </div>
+                              <div className="result-card__row">
+                                <dt>Recipient</dt>
+                                <dd>{shipment.customerName || '—'}</dd>
+                              </div>
+                              <div className="result-card__row">
+                                <dt>Phone</dt>
+                                <dd>{shipment.customerPhone || '—'}</dd>
+                              </div>
+                              {shipment.estimatedDelivery && (
+                                <div className="result-card__row">
+                                  <dt>Estimated Delivery</dt>
+                                  <dd>{new Date(shipment.estimatedDelivery).toLocaleDateString()}</dd>
+                                </div>
+                              )}
+                              {shipment.createdAt && (
+                                <div className="result-card__row">
+                                  <dt>Created</dt>
+                                  <dd>{new Date(shipment.createdAt).toLocaleString()}</dd>
+                                </div>
+                              )}
+                              {shipment.currentStatusNote && (
+                                <div className="result-card__row">
+                                  <dt>Notes</dt>
+                                  <dd>{shipment.currentStatusNote}</dd>
+                                </div>
+                              )}
+                            </dl>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
                 <p className="result-card__meta">
                   Showing the most recent shipments linked to {result.data.shipments?.[0]?.customerPhone}
                 </p>
