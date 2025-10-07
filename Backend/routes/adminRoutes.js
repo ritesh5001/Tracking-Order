@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Shipment = require("../models/Shipment");
+const verifyAdmin = require("../middleware/authMiddleware");
 
 // quick ping for debugging route mounting
 router.get('/ping', (req, res) => res.json({ ok: true, route: '/api/admin/ping' }));
 
-router.post("/create-shipment", async (req, res) => {
+router.post("/create-shipment", verifyAdmin, async (req, res) => {
   try {
     console.log('adminRoutes: create-shipment called, body=', req.body);
     const newShipment = new Shipment(req.body);
@@ -17,7 +18,7 @@ router.post("/create-shipment", async (req, res) => {
   }
 });
 
-router.put("/update-shipment/:trackingId", async (req, res) => {
+router.put("/update-shipment/:trackingId", verifyAdmin, async (req, res) =>{
   try {
     const updatedShipment = await Shipment.findOneAndUpdate(
       { trackingId: req.params.trackingId },

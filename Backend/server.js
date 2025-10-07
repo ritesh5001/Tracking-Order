@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const authRoutes = require("./routes/authRoutes");
 
 dotenv.config();
 
@@ -9,6 +10,8 @@ const adminRoutes = require("./routes/adminRoutes");
 const shipmentRoutes = require("./routes/shipmentRoutes");
 
 const app = express();
+
+
 
 // ✅ Middleware
 app.use(cors());
@@ -23,6 +26,7 @@ app.use((req, res, next) => {
 // ✅ Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/shipment", shipmentRoutes);
+app.use("/api/auth", authRoutes);
 
 // ✅ Connect MongoDB
 mongoose
