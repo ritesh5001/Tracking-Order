@@ -65,6 +65,19 @@ const ShipmentTracker = () => {
     );
   };
 
+  const phoneShipments =
+    result?.type === 'phone' && Array.isArray(result?.data?.shipments)
+      ? result.data.shipments
+      : [];
+  const phoneShipmentCount =
+    result?.type === 'phone'
+      ? result?.data?.count ?? phoneShipments.length
+      : 0;
+  const phoneLabel =
+    result?.type === 'phone'
+      ? phoneShipments[0]?.customerPhone || 'this phone number'
+      : 'this phone number';
+
   return (
     <div className="page page--track">
       <NavBar />
@@ -140,14 +153,14 @@ const ShipmentTracker = () => {
 
             {result?.type === 'phone' && (
               <div className="result-card" aria-live="polite">
-                <h2>{result.data.count} shipment{result.data.count === 1 ? '' : 's'} on this number</h2>
+                <h2>{phoneShipmentCount} shipment{phoneShipmentCount === 1 ? '' : 's'} on this number</h2>
                 <p className="track-list__intro">
-                  {result.data.count > 1
+                  {phoneShipmentCount > 1
                     ? 'Select a shipment below to view its full tracking details.'
                     : 'Showing all tracking details for this delivery.'}
                 </p>
                 <div className="track-list">
-                  {result.data.shipments?.map((shipment, index) => {
+                  {phoneShipments.map((shipment, index) => {
                     const identifier = shipment._id || shipment.trackingId || `shipment-${index}`;
                     const isExpanded = expandedIds.includes(identifier);
                     const detailId = `shipment-${identifier}-panel`;
@@ -220,7 +233,7 @@ const ShipmentTracker = () => {
                   })}
                 </div>
                 <p className="result-card__meta">
-                  Showing the most recent shipments linked to {result.data.shipments?.[0]?.customerPhone}
+                  Showing the most recent shipments linked to {phoneLabel}
                 </p>
               </div>
             )}
