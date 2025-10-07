@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// Axios instance pointing to backend routes via CRA proxy
+// Prefer explicit backend URL from env in production; fallback to CRA proxy in dev
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.REACT_APP_API_BASE_URL || '/api',
 });
 
 // Attach JWT if present

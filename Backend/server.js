@@ -11,10 +11,19 @@ const shipmentRoutes = require("./routes/shipmentRoutes");
 
 const app = express();
 
-
-
 // ✅ Middleware
-app.use(cors());
+// CORS: allow configured frontend origin(s) in production, default to permissive for development
+const allowedOrigins = process.env.FRONTEND_ORIGIN
+  ? process.env.FRONTEND_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean)
+  : true; // reflect request origin (permissive)
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 app.use(express.json());
 
 // Simple request logger for debugging (prints every incoming request)
@@ -27,6 +36,11 @@ app.use((req, res, next) => {
 app.use("/api/admin", adminRoutes);
 app.use("/api/shipment", shipmentRoutes);
 app.use("/api/auth", authRoutes);
+
+// Lightweight health endpoint for uptime checks
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
+});
 
 // ✅ Connect MongoDB
 mongoose

@@ -68,3 +68,17 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Production API configuration
+
+In development, API calls are proxied to `http://localhost:3000` via the `proxy` setting in `package.json`.
+
+For production builds, set an environment variable `REACT_APP_API_BASE_URL` to your backend base URL including `/api`.
+
+Example (Render backend):
+
+```
+REACT_APP_API_BASE_URL=https://tracking-order.onrender.com/api
+```
+
+You can place this in `.env.production` or configure it in your hosting provider's build environment.
