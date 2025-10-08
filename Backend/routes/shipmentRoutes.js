@@ -57,9 +57,21 @@ router.get("/:trackingId", async (req, res) => {
 // GET /api/shipment/by-phone/:phone
 // Return all shipments associated with a customer phone number
 router.get("/by-phone/:phone", async (req, res) => {
-  const phone = req.params.phone;
+  const raw = req.params.phone || '';
+  const phone = String(raw).replace(/\D/g, '');
   try {
-    const shipments = await Shipment.find({ customerPhone: phone }).sort({ createdAt: -1 });
+    let shipments = await Shipment.find({ customerPhone: phone }).sort({ createdAt: -1 });
+    if ((!shipments || shipments.length === 0) && phone.length >= 6) {
+      // Fallback: match by last 10 or 6 digits to accommodate saved formats
+      const last10 = phone.slice(-10);
+      const last6 = phone.slice(-6);
+      shipments = await Shipment.find({
+        $or: [
+          { customerPhone: last10 },
+          { customerPhone: last6 },
+        ],
+      }).sort({ createdAt: -1 });
+    }
     if (!shipments || shipments.length === 0) {
       return res.status(404).json({ message: "No shipments found for this phone number" });
     }

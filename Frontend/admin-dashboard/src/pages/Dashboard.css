@@ -11,6 +11,7 @@
 .grid{display:grid;gap:24px;margin-top:28px}
 @media (min-width: 960px){
 	.grid{grid-template-columns: minmax(0, 60%) minmax(0, 40%); align-items:start}
+	.card--recent{grid-column: 1 / -1}
 }
 
 /* Ensure section order maps to columns: first (Create) left, second (Update) right */
@@ -40,3 +41,23 @@
 .footer__link{color:var(--brand);text-decoration:none;font-weight:600}
 .footer__link:hover{text-decoration:underline}
 .muted{color:color-mix(in srgb, var(--text) 85%, var(--muted));font-weight:600}
+
+/* Responsive table for Recent Shipments */
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.table thead th{position:sticky;top:0;background:var(--card);z-index:1}
+
+@media (max-width: 900px){
+	.table thead{display:none}
+	.table tr{display:block;border:1px solid var(--border);border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(6,16,33,.06);overflow:hidden}
+	.table td{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border)}
+	.table td:last-child{border-bottom:0}
+	.table td::before{content:attr(data-label);font-weight:700;color:var(--muted)}
+	.table-wrap{overflow:visible}
+}
+
+/* Make controls comfortable on touch devices */
+@media (max-width: 600px){
+	.input,.select,.btn{height:44px}
+	.row.gap{gap:8px}
+}

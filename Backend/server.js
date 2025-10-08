@@ -1,6 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const helmet = require("helmet");
+const compression = require("compression");
+const path = require("path");
+const rateLimit = require("express-rate-limit");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
 
@@ -12,6 +16,11 @@ const shipmentRoutes = require("./routes/shipmentRoutes");
 const app = express();
 
 // ✅ Middleware
+app.disable('x-powered-by');
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+}));
+app.use(compression());
 // CORS: allow configured frontend origin(s) in production, default to permissive for development
 const allowedOrigins = process.env.FRONTEND_ORIGIN
   ? process.env.FRONTEND_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean)
@@ -25,6 +34,12 @@ app.use(
   })
 );
 app.use(express.json());
+
+// Basic rate limits (tweak as needed)
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 1000 });
+app.use('/api/auth', authLimiter);
+app.use('/api/', apiLimiter);
 
 // Simple request logger for debugging (prints every incoming request)
 app.use((req, res, next) => {
@@ -48,18 +63,25 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch((err) => console.error("❌ MongoDB Connection Failed:", err.message));
 
-// ✅ Default Route
-app.get("/", (req, res) => {
-  res.send("🚀 Shipment Tracking Backend is Running");
-});
+// ✅ Serve frontend in production
+const FRONTEND_BUILD = path.join(__dirname, '..', 'Frontend', 'admin-dashboard', 'build');
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(FRONTEND_BUILD));
+}
 
-// Catch-all 404 handler (returns JSON instead of Express HTML)
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not Found', path: req.originalUrl });
-});
+// ✅ SPA fallback for non-API routes in production
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    res.sendFile(path.join(FRONTEND_BUILD, 'index.html'));
+  });
+}
+
+// Catch-all 404 handler (JSON)
+app.use((req, res) => res.status(404).json({ error: 'Not Found', path: req.originalUrl }));
 
 // ✅ Server Listen
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
