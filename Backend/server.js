@@ -69,11 +69,12 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(FRONTEND_BUILD));
 }
 
-// ✅ SPA fallback for non-API routes in production
+// ✅ SPA fallback for non-API routes in production (Express 5 compatible)
+// Note: Express 5 no longer supports '*' string patterns with path-to-regexp v6.
+// Use a regex to match any path that does NOT start with /api/
 if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api/')) return next();
-    res.sendFile(path.join(FRONTEND_BUILD, 'index.html'));
+  app.get(/^\/(?!api\/).*/, (req, res, next) => {
+    return res.sendFile(path.join(FRONTEND_BUILD, 'index.html'));
   });
 }
 
