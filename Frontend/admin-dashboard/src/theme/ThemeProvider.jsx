@@ -5,6 +5,9 @@ const ThemeContext = createContext({
   theme: 'light', // resolved theme
   cycleMode: () => {},
   setMode: () => {},
+  palette: 'default', // 'default' | 'ocean' (extensible)
+  setPalette: () => {},
+  cyclePalette: () => {},
 });
 
 const getSystemTheme = () => (
@@ -23,6 +26,13 @@ export const ThemeProvider = ({ children }) => {
   });
 
   const [systemTheme, setSystemTheme] = useState(getSystemTheme());
+  const [palette, setPalette] = useState(() => {
+    try {
+      return localStorage.getItem('themePalette') || 'default';
+    } catch {
+      return 'default';
+    }
+  });
 
   // Watch system changes
   useEffect(() => {
@@ -35,17 +45,23 @@ export const ThemeProvider = ({ children }) => {
 
   const theme = useMemo(() => (mode === 'system' ? systemTheme : mode), [mode, systemTheme]);
 
-  // Apply theme to root attribute and color-scheme
+  // Apply theme + palette to root attributes and color-scheme
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
+    root.setAttribute('data-palette', palette);
     root.style.colorScheme = theme;
-  }, [theme]);
+  }, [theme, palette]);
 
   // Persist user-chosen mode (not the resolved theme)
   useEffect(() => {
     try { localStorage.setItem('themeMode', mode); } catch {}
   }, [mode]);
+
+  // Persist palette
+  useEffect(() => {
+    try { localStorage.setItem('themePalette', palette); } catch {}
+  }, [palette]);
 
   const cycleMode = useCallback(() => {
     // Toggle strictly between light and dark. If currently following system, use resolved theme to toggle.
@@ -55,7 +71,19 @@ export const ThemeProvider = ({ children }) => {
     });
   }, [systemTheme]);
 
-  const value = useMemo(() => ({ mode, theme, cycleMode, setMode }), [mode, theme, cycleMode, setMode]);
+  const cyclePalette = useCallback(() => {
+    setPalette((prev) => (prev === 'default' ? 'ocean' : 'default'));
+  }, []);
+
+  const value = useMemo(() => ({
+    mode,
+    theme,
+    cycleMode,
+    setMode,
+    palette,
+    setPalette,
+    cyclePalette,
+  }), [mode, theme, cycleMode, setMode, palette, setPalette, cyclePalette]);
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

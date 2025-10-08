@@ -4,23 +4,35 @@
 }
 
 :root[data-theme='light']{
-  --bg:#f6f8fb;
-  --card:#ffffff;
-  --muted:#5a6477;
-  --text:#0a0f1f;
-  --brand:#2b72ff;
-  --accent:#10d9a8;
+  /* Light: Red & White */
+  --bg:#ffffff;        /* white page background */
+  --card:#fff7f7;      /* subtle red-tinted card */
+  --muted:#6b7280;     /* neutral muted */
+  --text:#0a0a0a;      /* near-black text */
+  --brand:#e11d48;     /* rose-600 */
+  --accent:#fb7185;    /* rose-400 */
   --border:rgba(0,0,0,.12);
 }
 
 :root[data-theme='dark']{
-  --bg:#0b1020;
-  --card:#0f1427;
-  --muted:#95a0b4;
-  --text:#e6ecff;
-  --brand:#6aa7ff;
-  --accent:#7af0ce;
-  --border:rgba(255,255,255,.08);
+  /* Dark: Black-centric */
+  --bg:#0b0b0b;        /* near-black */
+  --card:#121212;      /* dark card */
+  --muted:#a3a3a3;     /* soft gray */
+  --text:#f5f5f5;      /* near-white */
+  --brand:#f43f5e;     /* rose-500 for accents */
+  --accent:#fb7185;    /* rose-400 */
+  --border:rgba(255,255,255,.10);
+}
+
+/* Optional alternate palette: ocean (keeps surfaces/text, swaps brand/accent) */
+:root[data-palette='ocean'][data-theme='light']{
+  --brand:#2563eb;   /* blue-600 */
+  --accent:#22d3ee;  /* cyan-400 */
+}
+:root[data-palette='ocean'][data-theme='dark']{
+  --brand:#60a5fa;   /* blue-400 */
+  --accent:#22d3ee;  /* cyan-400 */
 }
 
 /* default: respect system if no attribute yet */

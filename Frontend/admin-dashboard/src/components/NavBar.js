@@ -5,7 +5,7 @@ import './NavBar.css';
 import { useTheme } from '../theme/ThemeProvider.jsx';
 
 const NavBar = ({ showAdminLink = true }) => {
-  const { theme, cycleMode } = useTheme();
+  const { theme, cycleMode, palette, cyclePalette } = useTheme();
   const [anim, setAnim] = useState(false);
   const navLinks = useMemo(() => ([
     { to: '/', label: 'Home' },
@@ -43,6 +43,20 @@ const NavBar = ({ showAdminLink = true }) => {
           {showAdminLink && (
             <Link to="/admin" className="btn btn--ghost">Admin Login</Link>
           )}
+          <button
+            aria-label="Toggle palette"
+            title={`Style: ${palette}`}
+            className={`btn theme-toggle ${anim ? 'is-animating' : ''}`}
+            onClick={() => { setAnim(true); cyclePalette(); setTimeout(() => setAnim(false), 400); }}
+          >
+            {/* Swatch icon */}
+            <svg className="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="7" height="7" rx="2" fill="currentColor"/>
+              <rect x="14" y="3" width="7" height="7" rx="2" fill="currentColor" opacity="0.6"/>
+              <rect x="3" y="14" width="7" height="7" rx="2" fill="currentColor" opacity="0.6"/>
+              <rect x="14" y="14" width="7" height="7" rx="2" fill="currentColor" opacity="0.35"/>
+            </svg>
+          </button>
           <button
             aria-label="Toggle theme"
             title={`Theme: ${theme}`}
