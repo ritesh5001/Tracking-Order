@@ -6,3 +6,6 @@ Frontend/admin-dashboard/node_modules/
 
 # Env
 Backend/.env
+
+# Frontend env
+Frontend/admin-dashboard/.env*
