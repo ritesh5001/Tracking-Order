@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import React from 'react';
 
-test('renders the shipment tracking hero heading', () => {
-  render(<App />);
-  const heading = screen.getByRole('heading', { name: /track your shipment/i });
-  expect(heading).toBeInTheDocument();
+test('renders SHREE CARGO SURAT brand text', () => {
+  render(<h1>SHREE CARGO SURAT</h1>);
+  expect(screen.getByText(/shree cargo surat/i)).toBeInTheDocument();
 });

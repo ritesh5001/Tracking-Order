@@ -10,7 +10,6 @@ const NavBar = ({ showAdminLink = true }) => {
   const navLinks = useMemo(() => ([
     { to: '/', label: 'Home' },
     { to: '/track', label: 'Track Shipment' },
-    { to: '/about', label: 'About Us' },
     { to: '/contact', label: 'Contact' },
   ]), []);
   const onToggle = () => {
@@ -24,7 +23,7 @@ const NavBar = ({ showAdminLink = true }) => {
         <div className="nav__left">
           <Link to="/" className="brand">
             <img src={logo} alt="Logo" className="brand__logo" />
-            <span className="brand__name">TrackX</span>
+            <span className="brand__name">SHREE CARGO SURAT</span>
           </Link>
         </div>
         <ul className="nav__center">
