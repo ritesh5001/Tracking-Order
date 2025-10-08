@@ -145,9 +145,6 @@ const ShipmentTracker = () => {
                     </div>
                   )}
                 </dl>
-                <p className="result-card__meta">
-                  Created {result.data.createdAt ? new Date(result.data.createdAt).toLocaleString() : 'N/A'}
-                </p>
               </div>
             )}
 
