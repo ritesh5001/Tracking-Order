@@ -1,0 +1,8 @@
+
+# Node
+node_modules/
+Backend/node_modules/
+Frontend/admin-dashboard/node_modules/
+
+# Env
+Backend/.env
