@@ -210,12 +210,6 @@ const ShipmentTracker = () => {
                                   <dd>{new Date(shipment.estimatedDelivery).toLocaleDateString()}</dd>
                                 </div>
                               )}
-                              {shipment.createdAt && (
-                                <div className="result-card__row">
-                                  <dt>Created</dt>
-                                  <dd>{new Date(shipment.createdAt).toLocaleString()}</dd>
-                                </div>
-                              )}
                               {shipment.currentStatusNote && (
                                 <div className="result-card__row">
                                   <dt>Notes</dt>
