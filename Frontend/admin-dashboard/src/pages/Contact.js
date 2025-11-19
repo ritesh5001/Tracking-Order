@@ -28,7 +28,7 @@ const Contact = () => (
           <article className="section-card contact__card">
             <span className="tag">Email</span>
             <h3>Write to us</h3>
-            <a className="btn btn--primary contact__cta" href="mailto:shreecargo84@gmail.com">shreecargo84@gmail.com</a>
+            <a className="btn btn--primary contact__cta" href="mailto:helpshreecargosurat@gmail.com">helpshreecargosurat@gmail.com</a>
           </article>
           <article className="section-card contact__card">
             <span className="tag">Phone</span>
@@ -47,7 +47,7 @@ const Contact = () => (
             </div>
             <div>
               <span className="label">Email</span>
-              <a href="mailto:shreecargo84@gmail.com">shreecargo84@gmail.com</a>
+              <a href="mailto:helpshreecargosurat@gmail.com">helpshreecargosurat@gmail.com</a>
             </div>
             <div>
               <span className="label">Office Hours</span>
