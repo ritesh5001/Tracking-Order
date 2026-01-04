@@ -12,6 +12,52 @@ const HERO_METRICS = [
   { value: 'Since 1984', label: 'Trusted by Surat' }
 ];
 
+const PNR_STEPS = [
+  { label: 'Ordered' },
+  { label: 'Shipped' },
+  { label: 'In Transit' },
+  { label: 'Out for Delivery' },
+  { label: 'Delivered' },
+];
+
+const isPNRTrackingId = (trackingId) =>
+  typeof trackingId === 'string' && trackingId.trim().toUpperCase().startsWith('PNR');
+
+const StatusTimeline = ({ currentIndex }) => {
+  const safeIndex = Number.isFinite(currentIndex) ? currentIndex : 2;
+
+  return (
+    <div className="pnr-timeline" role="list" aria-label="Shipment status timeline">
+      {PNR_STEPS.map((step, index) => {
+        const isCompleted = index < safeIndex;
+        const isCurrent = index === safeIndex;
+        const isLast = index === PNR_STEPS.length - 1;
+
+        return (
+          <div
+            key={step.label}
+            className={
+              `pnr-step${isCompleted ? ' pnr-step--completed' : ''}${isCurrent ? ' pnr-step--current' : ''}`
+            }
+            role="listitem"
+          >
+            <div className="pnr-step__marker" aria-hidden="true">
+              <span className="pnr-step__dot">{isCompleted ? '✓' : ''}</span>
+              {!isLast && <span className="pnr-step__line" />}
+            </div>
+
+            <div className="pnr-step__content">
+              <div className="pnr-step__label">{step.label}</div>
+            </div>
+
+            <div className="pnr-step__state">{isCompleted ? 'Completed' : ''}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const Home = () => {
   const [mode, setMode] = useState('tracking'); // 'tracking' | 'phone'
   const [tracking, setTracking] = useState('');
@@ -29,7 +75,17 @@ const Home = () => {
     setLoading(true);
     try {
       if (mode === 'tracking') {
-        const { data } = await api.get(`/shipment/${encodeURIComponent(tracking)}`);
+        const cleanQuery = tracking.trim();
+        if (isPNRTrackingId(cleanQuery)) {
+          setResult({
+            trackingId: cleanQuery,
+            status: 'In Transit',
+            currentLocation: "Parcel is dispatched from Shreecargo warehouse and it's on the way",
+          });
+          return;
+        }
+
+        const { data } = await api.get(`/shipment/${encodeURIComponent(cleanQuery)}`);
         setResult(data);
       } else {
         const { data } = await api.get(`/shipment/by-phone/${encodeURIComponent(phone)}`);
@@ -103,6 +159,7 @@ const Home = () => {
 
                 {mode === 'tracking' && result && (
                   <div className="card result">
+                    {isPNRTrackingId(result?.trackingId) && <StatusTimeline currentIndex={2} />}
                     <div className="row"><span>Tracking ID</span><strong>{result.trackingId}</strong></div>
                     <div className="row"><span>Status</span><strong>{result.status}</strong></div>
                     <div className="row"><span>Location</span><strong>{result.currentLocation}</strong></div>

@@ -15,6 +15,10 @@ const shipmentRoutes = require("./routes/shipmentRoutes");
 
 const app = express();
 
+// If requests come through a proxy (common in production and sometimes in dev),
+// enable trust proxy so middleware like express-rate-limit can read client IPs safely.
+app.set('trust proxy', 1);
+
 // ✅ Middleware
 app.disable('x-powered-by');
 app.use(helmet({

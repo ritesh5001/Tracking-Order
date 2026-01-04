@@ -5,6 +5,72 @@ import api from '../api/axios';
 import './PageLayout.css';
 import './ShipmentTracker.css';
 
+const PNR_STEPS = [
+  { label: 'Ordered' },
+  { label: 'Shipped' },
+  { label: 'In Transit' },
+  { label: 'Out for Delivery' },
+  { label: 'Delivered' },
+];
+
+const isPNRTrackingId = (trackingId) =>
+  typeof trackingId === 'string' && trackingId.trim().toUpperCase().startsWith('PNR');
+
+const normalizeStatus = (value) => String(value || '').trim().toLowerCase();
+
+const getPNRStepIndexFromStatus = (status) => {
+  const normalized = normalizeStatus(status);
+
+  if (!normalized) return 2;
+  if (normalized === 'pending' || normalized === 'ordered' || normalized === 'order placed') return 0;
+  if (normalized === 'dispatched' || normalized === 'shipped') return 1;
+  if (normalized === 'in transit' || normalized === 'intransit') return 2;
+  if (normalized === 'out for delivery' || normalized === 'outfordelivery') return 3;
+  if (normalized === 'delivered') return 4;
+
+  return 2;
+};
+
+const getPNRDisplayStatus = (status) => {
+  const index = getPNRStepIndexFromStatus(status);
+  return PNR_STEPS[index]?.label || String(status || 'In Transit');
+};
+
+const StatusTimeline = ({ currentIndex }) => {
+  const safeIndex = Number.isFinite(currentIndex) ? currentIndex : 2;
+
+  return (
+    <div className="pnr-timeline" role="list" aria-label="Shipment status timeline">
+      {PNR_STEPS.map((step, index) => {
+        const isCompleted = index < safeIndex;
+        const isCurrent = index === safeIndex;
+        const isLast = index === PNR_STEPS.length - 1;
+
+        return (
+          <div
+            key={step.label}
+            className={
+              `pnr-step${isCompleted ? ' pnr-step--completed' : ''}${isCurrent ? ' pnr-step--current' : ''}`
+            }
+            role="listitem"
+          >
+            <div className="pnr-step__marker" aria-hidden="true">
+              <span className="pnr-step__dot">{isCompleted ? '✓' : ''}</span>
+              {!isLast && <span className="pnr-step__line" />}
+            </div>
+
+            <div className="pnr-step__content">
+              <div className="pnr-step__label">{step.label}</div>
+            </div>
+
+            <div className="pnr-step__state">{isCompleted ? 'Completed' : ''}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const ShipmentTracker = () => {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState(null);
@@ -29,6 +95,23 @@ const ShipmentTracker = () => {
       const compactQuery = cleanQuery.replace(/[\s-]/g, '');
       const numericOnly = compactQuery.replace(/\D/g, '');
       const isPhoneLookup = numericOnly.length >= 6 && numericOnly.length === compactQuery.length;
+
+      // If trackingId starts with PNR, do not call backend.
+      // Show the fixed tracking details + status flow as requested.
+      if (!isPhoneLookup && isPNRTrackingId(cleanQuery)) {
+        setResult({
+          type: 'tracking',
+          data: {
+            trackingId: cleanQuery,
+            status: 'In Transit',
+            currentLocation:
+              "Parcel is dispatched from Shreecargo warehouse and it's on the way",
+            customerName: 'Demo ..',
+            customerPhone: '9561368433',
+          },
+        });
+        return;
+      }
 
       if (isPhoneLookup) {
         const { data } = await api.get(`/shipment/by-phone/${numericOnly}`);
@@ -117,6 +200,11 @@ const ShipmentTracker = () => {
             {result?.type === 'tracking' && (
               <div className="result-card" aria-live="polite">
                 <h2>Shipment summary</h2>
+
+                {isPNRTrackingId(result?.data?.trackingId) && (
+                  <StatusTimeline currentIndex={getPNRStepIndexFromStatus(result?.data?.status)} />
+                )}
+
                 <dl className="result-card__grid">
                   <div className="result-card__row">
                     <dt>Tracking ID</dt>
@@ -124,20 +212,29 @@ const ShipmentTracker = () => {
                   </div>
                   <div className="result-card__row">
                     <dt>Status</dt>
-                    <dd>{result.data.status}</dd>
+                    <dd>
+                      {isPNRTrackingId(result?.data?.trackingId)
+                        ? getPNRDisplayStatus(result.data.status)
+                        : result.data.status}
+                    </dd>
                   </div>
                   <div className="result-card__row">
                     <dt>Current Location</dt>
                     <dd>{result.data.currentLocation}</dd>
                   </div>
-                  <div className="result-card__row">
-                    <dt>Recipient</dt>
-                    <dd>{result.data.customerName}</dd>
-                  </div>
-                  <div className="result-card__row">
-                    <dt>Phone</dt>
-                    <dd>{result.data.customerPhone}</dd>
-                  </div>
+
+                  {!isPNRTrackingId(result?.data?.trackingId) && (
+                    <>
+                      <div className="result-card__row">
+                        <dt>Recipient</dt>
+                        <dd>{result.data.customerName}</dd>
+                      </div>
+                      <div className="result-card__row">
+                        <dt>Phone</dt>
+                        <dd>{result.data.customerPhone}</dd>
+                      </div>
+                    </>
+                  )}
                   {result.data.estimatedDelivery && (
                     <div className="result-card__row">
                       <dt>Estimated Delivery</dt>
@@ -190,8 +287,22 @@ const ShipmentTracker = () => {
                             <dl className="result-card__grid track-list__details">
                               <div className="result-card__row">
                                 <dt>Status</dt>
-                                <dd>{shipment.status || '—'}</dd>
+                                <dd>
+                                  {isPNRTrackingId(shipment?.trackingId)
+                                    ? getPNRDisplayStatus(shipment.status)
+                                    : shipment.status || '—'}
+                                </dd>
                               </div>
+
+                              {isPNRTrackingId(shipment?.trackingId) && (
+                                <div className="result-card__row">
+                                  <dt>Order Progress</dt>
+                                  <dd>
+                                    <StatusTimeline currentIndex={getPNRStepIndexFromStatus(shipment?.status)} />
+                                  </dd>
+                                </div>
+                              )}
+
                               <div className="result-card__row">
                                 <dt>Current Location</dt>
                                 <dd>{shipment.currentLocation || '—'}</dd>
