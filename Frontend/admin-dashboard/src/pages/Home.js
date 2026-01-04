@@ -21,7 +21,7 @@ const PNR_STEPS = [
 ];
 
 const isPNRTrackingId = (trackingId) =>
-  typeof trackingId === 'string' && trackingId.trim().toUpperCase().startsWith('PNR');
+  typeof trackingId === 'string' && trackingId.trim().toUpperCase().startsWith('PNR6');
 
 const StatusTimeline = ({ currentIndex }) => {
   const safeIndex = Number.isFinite(currentIndex) ? currentIndex : 2;
